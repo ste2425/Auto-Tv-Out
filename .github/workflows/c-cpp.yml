@@ -1,0 +1,37 @@
+name: Build
+
+on:
+  push:
+    branches:
+      - '*'
+    tags: '**' # Trigger on tags for releases
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container: pspdev/pspdev:latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install dependencies
+      run: |
+        apk add build-base git bash cmake gcompat
+
+    - name: Make Release Folder
+      run: mkdir -p release
+
+    - name: Compile Plugin
+      run: make
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: AutoTvOut
+        path: auto_tvout.prx
+
+    - name: Release
+      uses: softprops/action-gh-release@v2
+      if: github.ref_type == 'tag'
+      with:
+        prerelease: true
+        files: auto_tvout.prx
