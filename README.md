@@ -8,7 +8,16 @@ A PSP plugin that automatically enables TVout when you have a AV cable connected
 ## Demo from a cold boot
 
 
+https://github.com/user-attachments/assets/0f46cb5a-038d-47bd-9841-010a28d38b1c
+
+
+
 ## Demo of connecting and re-connecting the cable
+
+
+
+https://github.com/user-attachments/assets/83404e08-234a-49e7-ad44-3fb0e51ed5fc
+
 
 
 ---
