@@ -1,6 +1,3 @@
-/*
- * main.c - PopsAnalog
- */
 #include <pspsdk.h>
 #include <pspkernel.h>
 #include <psploadcore.h>
