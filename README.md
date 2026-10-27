@@ -3,7 +3,9 @@
 
 <p align="center"><img src="./assets/logo.png" width="600"/></p>
 
-A PSP plugin that automatically enables TVout when you have a AV cable connected. It will monitor that TVOut i enabled and should it be disabled (such as Homebrew triggering a reboot) it will be re-enabled.
+A PSP plugin that automatically enables TVout when you have a AV cable connected. This plugin will ensure that TVOut remains enabled should it get disabled for any reason.
+
+**If you use the PSPlaceable please see the PSPlaceable section below.**
 
 ## Demo from a cold boot
 
@@ -33,18 +35,11 @@ https://github.com/user-attachments/assets/83404e08-234a-49e7-ad44-3fb0e51ed5fc
 
 ## Why
 
-Part of my [PSP Bluetooth Controller](https://github.com/ste2425/PSP-Bluetooth-Plugin) i neeed a way to enable TVOut when the console is connected to a dock i will be designing. I realised this would be useful for anyone building Cosolizers such as the PSPlaceable and it offers a better solution.
+I am working on a project [PSP Bluetooth Controller's](https://github.com/ste2425/PSP-Bluetooth-Plugin) which eventually will involve a dock you connect the PSP to.
 
-Currently you have two options which have their flaws.
+One of the main goals is that when connected to the dock TVOut should automatically be enabled. I realized other consolizer builds would benefit from this too so turned it into its own plugin.
 
-### Mess with DVE methods
-
-Manually triggering DVE methods to enable TVOut. The downside is its complexity, you need to deal with video modes, resolutions and managing state. 
-
-### Trigger screen button press
-You coulg triger a screen button press. This is what the PSPlaceable does, but it is slow. From a cold boot you need to wait 7 seconds or so before the console recognises the button, then hold for a further 5 seconds before TVOut is enabled.
-
-This plugin is faster and more reliable, should TVOut be disabled for any reason this plugin will automatically re-enable it.
+Historically consolizers would rely on holding the display button until TVOut is enabled. However should it get disabled for any reason it will not be re-enabled. This plugin fixes that.
 
 ## Known Working Environments
 
@@ -60,12 +55,25 @@ I have tested on the following combinations of system. Obviously `1000` model do
 | ARK-5 | 6.61 | TA-088v3 (02g) |
 | ARK-5 | 6.60 | TA-088v3 (02g) |
 | ARK-4 | 6.60 | TA-088v3 (02g) |
+| ARK-4 | 6.60 | TA-095v1 (09g) |
+
+## PSPlaceable
+
+If you have a PSPlaceable it also attempts to set the TVOut by holding the display button. They should both work together but it would be best to update to version `2.4.0`. This adds a new configuration setting on its `settings` page to stop the PSPlaceable enabling TVOut. Leaving it up to the plugin.
+
+Web app: https://ste2425.github.io/PSP-Bluetooth/
+
+I recommend using the plugin and disabling it in the Web App.
 
 ## How It Works
 
-The `sceImpose` PRX manages the button screen button. I fed the plugin into AI asking it to figure out what happens with that button. It found that the handler for that button simply sets a flag and there is a background process monitoring the flag. This process calls a internal method after a given timeout.
+I have tried in the past to solve this problem making direct DVE calls. I got something partially working. However it had graphical errors and didn't have the standard state management. If you removed the AVCable or pressed the display button the LCD does not re-enable.
 
-So i find that internal method ait its specific offset and call it manually.
+Instead i changed tacts and get my `impose` PRX into AI and told it `Tell me what happens when the Display button is pressed`. It essentially saying `a flag is set, a background process checks that flag and compares it against a tick counter. When the counter reaches a threshold it calls internal method XYZ`
+
+So i asked for the offset of that internal method and the first few MIPS commands it executes and built a plugin to find the method based on the offset. I then verified the MIPS commands to be sure i had the correct method.
+
+Lastly i extracted all the variants of the `impose` PRX from the 6.61 and 6.60 updaters to verify the offsets are the same and AI said yes, so who am i to argue.
 
 # Acknowledgements
 
@@ -78,4 +86,4 @@ Im not getting into the AI debate but i know some have strong opinions on th sub
 So to be clear AI did not write this plugin, i did. I have used AI tooling as stated below.
 
 * Making the logo, im not a designer. If a human would like to make a logo for this project i would love to use that instead.
-* Reversing the `Impose` prx. I gave it the plugin and asked it to tell me the logic around the display button. I then wrote the plugin based on what it told me.
+* Reversing the `Impose` prx. 
